@@ -6,8 +6,81 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
+import { useState } from "react";
+import { toast, useToast } from "@/hooks/use-toast";
 
 export default function ContactPage() {
+
+const [form, setForm] = useState({
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  company: "",
+  website: "",
+  interest: "",
+  budget: "",
+  message: "",
+});
+const [loading, setLoading] = useState(false);
+const [status, setStatus] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+const { toast } = useToast();
+
+const handleChange = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((s) => ({ ...s, [key]: e.target.value }));
+    };
+
+
+const handleSelectChange = (key: keyof typeof form) => (value: string) => {
+    setForm((s) => ({ ...s, [key]: value }));
+  };
+
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus(null);
+    
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setForm({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          company: "",
+          website: "",
+          interest: "",
+          budget: "",
+          message: "",
+        });
+        toast({
+      title: "Message sent",
+      description: "Thank you — we received your message and will reply soon.",
+    });
+       
+      } else {
+          toast({
+      title: "Failed to send message.",
+    });
+      }
+    } catch (err) {
+      toast({
+      title: "Something went wrong.",
+    });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -30,82 +103,121 @@ export default function ContactPage() {
               <Card className="border-2">
                 <CardContent className="pt-8">
                   <h2 className="text-3xl font-black mb-8" style={{ color: "#000000" }}>Send Us a Message</h2>
-                  <form className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-semibold mb-2">First Name *</label>
-                        <Input placeholder="John" required />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-2">Last Name *</label>
-                        <Input placeholder="Doe" required />
-                      </div>
-                    </div>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div>
+    <label className="block text-sm font-semibold mb-2">First Name *</label>
+    <Input
+      placeholder="John"
+      required
+      value={form.firstName}
+      onChange={handleChange("firstName")}
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-semibold mb-2">Last Name *</label>
+    <Input
+      placeholder="Doe"
+      required
+      value={form.lastName}
+      onChange={handleChange("lastName")}
+    />
+  </div>
+</div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-semibold mb-2">Email Address *</label>
-                        <Input type="email" placeholder="john@company.com" required />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold mb-2">Phone Number</label>
-                        <Input type="tel" placeholder="+1 (555) 123-4567" />
-                      </div>
-                    </div>
+<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div>
+    <label className="block text-sm font-semibold mb-2">Email Address *</label>
+    <Input
+      type="email"
+      placeholder="john@company.com"
+      required
+      value={form.email}
+      onChange={handleChange("email")}
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-semibold mb-2">Phone Number</label>
+    <Input
+      type="tel"
+      placeholder="+1 (555) 123-4567"
+      value={form.phone}
+      onChange={handleChange("phone")}
+    />
+  </div>
+</div>
 
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Company Name *</label>
-                      <Input placeholder="Your Company" required />
-                    </div>
+<div>
+  <label className="block text-sm font-semibold mb-2">Company Name *</label>
+  <Input
+    placeholder="Your Company"
+    required
+    value={form.company}
+    onChange={handleChange("company")}
+  />
+</div>
 
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Company Website</label>
-                      <Input placeholder="https://yourcompany.com" />
-                    </div>
+<div>
+  <label className="block text-sm font-semibold mb-2">Company Website</label>
+  <Input
+    placeholder="https://yourcompany.com"
+    value={form.website}
+    onChange={handleChange("website")}
+  />
+</div>
 
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">What are you interested in? *</label>
-                      <Select required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a service" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="lead-generation">Lead Generation</SelectItem>
-                          <SelectItem value="content-marketing">Content Marketing</SelectItem>
-                          <SelectItem value="seo">SEO Services</SelectItem>
-                          <SelectItem value="social-media">Social Media Marketing</SelectItem>
-                          <SelectItem value="brand-management">Brand Management</SelectItem>
-                          <SelectItem value="gtm-strategy">Go-to-Market Strategy</SelectItem>
-                          <SelectItem value="multiple">Multiple Services</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+<div>
+  <label className="block text-sm font-semibold mb-2">What are you interested in? *</label>
+  <Select
+    value={form.interest}
+    onValueChange={handleSelectChange("interest")}
+    required
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select a service" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="lead-generation">Lead Generation</SelectItem>
+      <SelectItem value="content-marketing">Content Marketing</SelectItem>
+      <SelectItem value="seo">SEO Services</SelectItem>
+      <SelectItem value="social-media">Social Media Marketing</SelectItem>
+      <SelectItem value="brand-management">Brand Management</SelectItem>
+      <SelectItem value="gtm-strategy">Go-to-Market Strategy</SelectItem>
+      <SelectItem value="multiple">Multiple Services</SelectItem>
+      <SelectItem value="other">Other</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
 
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Monthly Marketing Budget</label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select budget range" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="under-5k">Under $5,000</SelectItem>
-                          <SelectItem value="5k-10k">$5,000 - $10,000</SelectItem>
-                          <SelectItem value="10k-25k">$10,000 - $25,000</SelectItem>
-                          <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
-                          <SelectItem value="50k-plus">$50,000+</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+<div>
+  <label className="block text-sm font-semibold mb-2">Monthly Marketing Budget</label>
+  <Select
+    value={form.budget}
+    onValueChange={handleSelectChange("budget")}
+  >
+    <SelectTrigger>
+      <SelectValue placeholder="Select budget range" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="under-5k">Under $5,000</SelectItem>
+      <SelectItem value="5k-10k">$5,000 - $10,000</SelectItem>
+      <SelectItem value="10k-25k">$10,000 - $25,000</SelectItem>
+      <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
+      <SelectItem value="50k-plus">$50,000+</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
 
-                    <div>
-                      <label className="block text-sm font-semibold mb-2">Tell us about your project *</label>
-                      <Textarea
-                        placeholder="Describe your marketing goals, challenges, and what you're looking to achieve..."
-                        rows={6}
-                        required />
-
-                    </div>
+<div>
+  <label className="block text-sm font-semibold mb-2">Tell us about your project *</label>
+  <Textarea
+    placeholder="Describe your marketing goals, challenges, and what you're looking to achieve..."
+    rows={6}
+    required 
+    value={form.message}
+    onChange={handleChange("message")}
+  />
+</div>
 
                     <Button
                       type="submit"
@@ -192,6 +304,6 @@ export default function ContactPage() {
       </section>
 
       <Footer />
-    </div>);
-
+    </div>
+  );
 }
