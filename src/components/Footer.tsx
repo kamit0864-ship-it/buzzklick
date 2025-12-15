@@ -21,19 +21,19 @@ export function Footer() {
               Transforming B2B SaaS brands into powerful stories with data-driven marketing strategies that drive growth.
             </p>
             <div className="flex gap-4">
-              <Link href="#" className="hover:text-[var(--primary-hover)] transition-colors">
+              <Link target="_blank" href={`https://www.linkedin.com/company/buzzklick/
+`} className="hover:text-[var(--primary-hover)] transition-colors">
                 <Linkedin size={24} />
               </Link>
-              <Link href="#" className="hover:text-[var(--primary-hover)] transition-colors">
-                <Twitter size={24} />
-              </Link>
-              <Link href="#" className="hover:text-[var(--primary-hover)] transition-colors">
+             
+              <Link target="_blank" href={`https://www.facebook.com/buzzklickOfficial/`} className="hover:text-[var(--primary-hover)] transition-colors">
                 <Facebook size={24} />
               </Link>
-              <Link href="#" className="hover:text-[var(--primary-hover)] transition-colors">
+              <Link target="_blank" href={`https://www.instagram.com/buzzklick_official/`} className="hover:text-[var(--primary-hover)] transition-colors">
                 <Instagram size={24} />
               </Link>
-              <Link href="#" className="hover:text-[var(--primary-hover)] transition-colors">
+              <Link target="_blank" href={`https://www.youtube.com/@Buzz_Klick_Official
+`} className="hover:text-[var(--primary-hover)] transition-colors">
                 <Youtube size={24} />
               </Link>
             </div>
